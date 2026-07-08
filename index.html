@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>اتاق فرمان عرفان</title>
+    <!-- گره زدن شناسنامه PWA به برنامه -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .app-card {
+            background: #1e293b;
+            padding: 30px;
+            border-radius: 24px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            border: 1px solid #334155;
+        }
+        h1 { color: #38bdf8; font-size: 24px; margin-bottom: 8px; }
+        p { color: #94a3b8; font-size: 15px; line-height: 1.6; }
+        .status-badge {
+            display: inline-block;
+            background-color: #059669;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        button:active { background-color: #1d4ed8; }
+    </style>
+</head>
+<body>
+
+    <div class="app-card">
+        <h1>⚙️ اتاق فرمان پویای عرفان</h1>
+        <p>این یک وب‌اپلیکیشن مستقل (PWA) است که مستقیم تحت موتور گوگل کروم گوشی شما نصب می‌شود.</p>
+        
+        <div class="status-badge">وضعیت سیستم: آماده به کار  ✓</div>
+        
+        <button onclick="testEngine()">تست عملکرد موتور ⚡</button>
+    </div>
+
+    <script>
+        function testEngine() {
+            alert("موتور با موفقیت پاسخ داد! کدها کاملاً آفلاین اجرا می‌شوند. 😎");
+        }
+
+        // 🕵️‍♂️ بیدار کردن و ثبت رسمی نگهبان شب (Service Worker)
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+            .then(() => console.log("Service Worker Registered! ✅"))
+            .catch(err => console.log("SW Registration Failed! ❌", err));
+        }
+    </script>
+</body>
+</html>
