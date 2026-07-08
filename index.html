@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>اتاق فرمان عرفان</title>
-    <!-- گره زدن شناسنامه PWA به برنامه -->
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#2563eb">
     <style>
@@ -32,17 +31,37 @@
             border: 1px solid #334155;
         }
         h1 { color: #38bdf8; font-size: 24px; margin-bottom: 8px; }
-        p { color: #94a3b8; font-size: 15px; line-height: 1.6; }
-        .status-badge {
-            display: inline-block;
-            background-color: #059669;
-            color: white;
-            padding: 6px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: bold;
-            margin: 15px 0;
+        p { color: #94a3b8; font-size: 14px; margin-bottom: 20px; }
+        
+        /* استایل بخش تایمر */
+        .timer-box {
+            background: #0f172a;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px dashed #38bdf8;
         }
+        input[type="number"] {
+            width: 80px;
+            background: #1e293b;
+            border: 2px solid #334155;
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 18px;
+            text-align: center;
+            margin-left: 10px;
+        }
+        input:focus { border-color: #38bdf8; outline: none; }
+        
+        .countdown-display {
+            font-size: 32px;
+            font-weight: bold;
+            color: #f59e0b;
+            margin-top: 15px;
+            font-family: monospace;
+        }
+        
         button {
             background-color: #2563eb;
             color: white;
@@ -54,7 +73,6 @@
             cursor: pointer;
             width: 100%;
             transition: background 0.2s;
-            margin-top: 10px;
         }
         button:active { background-color: #1d4ed8; }
     </style>
@@ -62,24 +80,73 @@
 <body>
 
     <div class="app-card">
-        <h1>⚙️ اتاق فرمان پویای عرفان</h1>
-        <p>این یک وب‌اپلیکیشن مستقل (PWA) است که مستقیم تحت موتور گوگل کروم گوشی شما نصب می‌شود.</p>
+        <h1>⚙️ اتاق فرمان عرفان</h1>
+        <p>تنظیم زمان معکوس برای شلیک نوتیفیکیشن هشدار</p>
         
-        <div class="status-badge">وضعیت سیستم: آماده به کار  ✓</div>
+        <div class="timer-box">
+            <label>زمان (به ثانیه): </label>
+            <input type="number" id="timeInput" value="5" min="1">
+            <div class="countdown-display" id="countdownView">00</div>
+        </div>
         
-        <button onclick="testEngine()">تست عملکرد موتور ⚡</button>
+        <button onclick="startCountdown()">شروع شمارش معکوس ⚡</button>
     </div>
 
     <script>
-        function testEngine() {
-            alert("موتور با موفقیت پاسخ داد! کدها کاملاً آفلاین اجرا می‌شوند. 😎");
+        let timerInterval;
+
+        // به محض لود شدن، اجازه نوتیفیکیشن را از کاربر بگیر
+        document.addEventListener('DOMContentLoaded', () => {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(perm => {
+                    console.log("وضعیت دسترسی نوتیفیکیشن:", perm);
+                });
+            }
+        });
+
+        function startCountdown() {
+            clearInterval(timerInterval);
+            let seconds = parseInt(document.getElementById('timeInput').value);
+            const display = document.getElementById('countdownView');
+            
+            if (isNaN(seconds) || seconds <= 0) {
+                alert("لطفاً یک زمان معتبر وارد کن مهندس! ⏱️");
+                return;
+            }
+
+            display.innerText = seconds;
+
+            timerInterval = setInterval(() => {
+                seconds--;
+                display.innerText = seconds;
+
+                if (seconds <= 0) {
+                    clearInterval(timerInterval);
+                    sendNotification(); // شلیک نوتیفیکیشن نهایی
+                }
+            }, 1000);
         }
 
-        // 🕵️‍♂️ بیدار کردن و ثبت رسمی نگهبان شب (Service Worker)
+        function sendNotification() {
+            if (Notification.permission === 'granted') {
+                // ارسال نوتیفیکیشن از طریق سرویس ورکر (روال استاندارد PWA)
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.showNotification('⚠️ هشدار اتاق فرمان!', {
+                        body: 'زمان معکوس به پایان رسید و موتور با موفقیت چک شد! 🚀',
+                        icon: 'https://cdn-icons-png.flaticon.com/512/9343/9343058.png',
+                        vibrate: [200, 100, 200],
+                        badge: 'https://cdn-icons-png.flaticon.com/512/9343/9343058.png'
+                    });
+                });
+            } else {
+                alert("زمان تموم شد! (اما اجازه نوتیفیکیشن رو به مرورگر ندادی 🔔)");
+            }
+        }
+
+        // فعال کردن سرویس ورکر
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js')
-            .then(() => console.log("Service Worker Registered! ✅"))
-            .catch(err => console.log("SW Registration Failed! ❌", err));
+            .then(() => console.log("Service Worker Active ✅"));
         }
     </script>
 </body>
